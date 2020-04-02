@@ -9,3 +9,5 @@ notebooks/building_1176_study/.ipynb_checkpoints/
 /notebooks/building_1176_study/.ipynb_checkpoints/
 
 data/raw/ashrae-energy-prediction.zip
+
+models/test/
