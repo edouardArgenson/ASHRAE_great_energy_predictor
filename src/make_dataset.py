@@ -16,6 +16,8 @@ from os import path
 
 def load_and_prepare_site_data(data_folder_path, min_timestamp, max_timestamp):
     
+    print('Loading and preparing each site weather data..')
+    
     # Loads weather data
     raw_df_weather = pd.read_csv(path.join(data_folder_path, 'weather_test.csv'), 
                      parse_dates=['timestamp'], index_col=['site_id', 'timestamp'])
