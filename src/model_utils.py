@@ -176,9 +176,12 @@ class ModelContainer:
         dirty_index = X[~clean_rows].index
         
         clean_preds = self.best_model.predict(X.loc[clean_index])
-        dirty_preds = self.helper_model.predict(X.loc[dirty_index])
-        
         preds_df_clean = pd.Series(data=clean_preds, index=clean_index)
+        
+        if dirty_index.empty:
+            return preds_df_clean
+            
+        dirty_preds = self.helper_model.predict(X.loc[dirty_index])
         preds_df_dirty = pd.Series(data=dirty_preds, index=dirty_index)
         
         preds = pd.concat([preds_df_clean, preds_df_dirty], axis=0)

@@ -52,11 +52,21 @@ def make_predictions(data_folder, trained_model_base_folder, training_timestamp)
     # Load prediction timestamps for each meter of each building.
     (prediction_rows, min_timestamp, max_timestamp) = load_prediction_rows(data_folder)
     
+    print('prediction_rows.head():')
+    print(prediction_rows.head())
+    
     # Prepare each site weather data.
-    site_weather_data = make_dataset.load_and_prepare_site_data(data_folder, min_timestamp, max_timestamp)
+    site_weather_data = make_dataset.load_and_prepare_site_data(
+            data_folder,
+            'test',
+            min_timestamp, 
+            max_timestamp, 
+            extrapolate_mas=True, 
+            drop_nas=False
+            )
 
     # Retrieve each building site.
-    meter_site_table = build_meter_site_table(data_folder, prediction_rows)
+    meter_site_table = make_dataset.build_meter_site_table(data_folder, prediction_rows)
 
     # Keep only (building, meter) for which we trained a model.
     sub_meter_site_table = filter_buildings_without_model(training_folder, meter_site_table)
@@ -145,20 +155,6 @@ def load_model_and_predict(
     return meter_predictions_df
 
 
-def build_meter_site_table(data_folder, prediction_rows):
-    
-    building_site_data = pd.read_csv(
-        path.join(data_folder, 'building_metadata.csv'), 
-        index_col='building_id', 
-        usecols=['building_id', 'site_id']
-    )
-    
-    buildings_and_meters = prediction_rows.groupby(['building_id', 'meter']).count()
-    buildings_and_meters.drop('timestamp', axis=1, inplace=True)
-    
-    return buildings_and_meters.join(building_site_data, on='building_id', how='left')
-    
-    
 def load_model(training_folder_path, building, meter):
     b_folder = 'building_' + str(building)
     m_folder = 'meter_' + str(meter)
